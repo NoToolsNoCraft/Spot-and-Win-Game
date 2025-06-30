@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spot & Win</title>
+  <style>
+    body {
+      font-family: 'Times New Roman', Times, serif, sans-serif;
+      background-color: #f1f3f5;
+      color: #333;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+
+    .game-wrapper {
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      max-width: 700px;
+      width: 100%;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .game-wrapper h1 {
+      font-size: 1.8rem;
+      margin-bottom: 10px;
+    }
+
+    .game-wrapper p {
+      font-size: 1.2rem;
+      margin-bottom: 20px;
+      color: #555;
+    }
+
+    #game-container {
+      position: relative;
+      display: inline-block;
+      width: 90%;
+      max-width: 600px;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    #game-image {
+      width: 100%;
+      height: auto;
+      cursor: crosshair;
+      display: block;
+      border-radius: 6px;
+    }
+
+    .marker, .debug-marker {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+    }
+
+    .marker {
+      border: 3px solid #dc3545;
+      width: 6vw;
+      height: 6vw;
+      max-width: 40px;
+      max-height: 40px;
+      box-shadow: 0 0 8px rgba(220, 53, 69, 0.5);
+    }
+
+    .debug-marker {
+      background-color: rgba(40, 167, 69, 0.4);
+      z-index: 10;
+    }
+
+    /* Modal Styles */
+    #win-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.6);
+      z-index: 999;
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    #win-modal-content {
+      background-color: #ffffff;
+      padding: 30px 20px;
+      max-width: 90%;
+      width: 400px;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      animation: slideUp 0.4s ease-out;
+    }
+
+    #win-modal-content h2 {
+      color: #28a745;
+      margin-bottom: 10px;
+      font-size: 1.5rem;
+    }
+
+    #win-modal-content p {
+      margin-bottom: 15px;
+      font-size: 1rem;
+    }
+
+    #win-modal-content button {
+      padding: 12px 24px;
+      background-color: #28a745;
+      color: #fff;
+      border: none;
+      font-size: 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    #win-modal-content button:hover {
+      background-color: #218838;
+    }
+
+    #social-share a {
+    display: inline-block;
+    margin: 6px 8px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    color: white;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease;
+    }
+
+    #share-facebook { background-color: #3b5998; }
+    #share-whatsapp { background-color: #25D366; }
+    #share-viber { background-color: #665cac; }
+    #share-telegram { background-color: #0088cc; }
+
+    #social-share a:hover {
+    opacity: 0.85;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    @media (max-width: 600px) {
+        body {
+            padding: 0;
+        }
+      .marker {
+        width: 8vw;
+        height: 8vw;
+      }
+
+      .game-wrapper {
+        padding: 15px;
+      }
+
+      .game-wrapper h1 {
+        font-size: 1.4rem;
+      }
+
+      #win-modal-content {
+        padding: 20px 15px;
+      }
+
+      #win-modal-content h2 {
+        font-size: 1.2rem;
+      }
+
+      #win-modal-content button {
+        font-size: 0.9rem;
+        padding: 10px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="game-wrapper">
+  <h1>🍏 Find the 5 Apples!</h1>
+<p>🍎 Click on each apple in the image to mark it and unlock your reward! 🎁</p>
+
+
+  <div id="game-container">
+    <img id="game-image" src="image.png" alt="Spot the Apples" style="cursor: crosshair;">
+  </div>
+</div>
+
+
+
+<div id="win-modal">
+  <div id="win-modal-content">
+    <h2>🎉 Congratulations! 🎉</h2>
+    <p>You found all 5 apples! Here's your reward:</p>
+    <p><strong>👉 Use code: <span style="color:#d9534f;">APPLE2025</span> 👈</strong></p>
+    
+    <button onclick="restartGame()">🔁 Play Again</button>
+
+    <!-- Social Share Buttons -->
+    <div id="social-share">
+      <p style="margin-top: 20px;">Share the fun with your friends:</p>
+      <a href="#" id="share-facebook" target="_blank">📘 Facebook</a>
+      <a href="#" id="share-whatsapp" target="_blank">🟢 WhatsApp</a>
+      <a href="#" id="share-viber" target="_blank">🔵 Viber</a>
+      <a href="#" id="share-telegram" target="_blank">📨 Telegram</a>
+    </div>
+
+    
+  </div>
+</div>
+
+
+
+<script>
+  const image = document.getElementById('game-image');
+  const container = document.getElementById('game-container');
+
+  const targets = [
+    { x: 390, y: 220, radius: 45 },
+    { x: 210, y: 412, radius: 45 },
+    { x: 460, y: 180, radius: 50 },
+    { x: 426, y: 340, radius: 45 },
+    { x: 500, y: 328, radius: 45 },
+  ];
+
+  const foundTargets = [];
+
+
+
+  image.onload = () => {
+    showDebugMarkers();  // Comment out before production
+  };
+
+
+
+
+  image.addEventListener('click', (event) => {
+    const rect = image.getBoundingClientRect();
+    const clickX = event.clientX - rect.left;
+    const clickY = event.clientY - rect.top;
+
+    const scaleX = image.naturalWidth / image.clientWidth;
+    const scaleY = image.naturalHeight / image.clientHeight;
+
+    const realX = clickX * scaleX;
+    const realY = clickY * scaleY;
+
+    targets.forEach((target, index) => {
+      const distance = Math.sqrt(Math.pow(realX - target.x, 2) + Math.pow(realY - target.y, 2));
+      if (distance <= target.radius && !foundTargets.includes(index)) {
+        foundTargets.push(index);
+        placeMarker(clickX, clickY);
+
+        if (foundTargets.length === targets.length) {
+          openModal();
+        }
+      }
+    });
+  });
+
+  function placeMarker(x, y) {
+    const marker = document.createElement('div');
+    marker.classList.add('marker');
+    marker.style.left = `${x}px`;
+    marker.style.top = `${y}px`;
+    container.appendChild(marker);
+  }
+
+  function showDebugMarkers() {
+    const scaleX = image.clientWidth / image.naturalWidth;
+    const scaleY = image.clientHeight / image.naturalHeight;
+
+    targets.forEach(target => {
+      const debugMarker = document.createElement('div');
+      debugMarker.classList.add('debug-marker');
+      debugMarker.style.width = `${target.radius * 2 * scaleX}px`;
+      debugMarker.style.height = `${target.radius * 2 * scaleY}px`;
+      debugMarker.style.left = `${target.x * scaleX}px`;
+      debugMarker.style.top = `${target.y * scaleY}px`;
+      container.appendChild(debugMarker);
+    });
+  }
+
+  function openModal() {
+    document.getElementById('win-modal').style.display = 'flex';
+  }
+
+  function closeModal() {
+    document.getElementById('win-modal').style.display = 'none';
+  }
+
+  function restartGame() {
+    // Hide the modal
+    document.getElementById('win-modal').style.display = 'none';
+
+    // Clear found targets
+    foundTargets.length = 0;
+
+    // Remove all marker elements from the game container
+    document.querySelectorAll('#game-container .marker').forEach(marker => marker.remove());
+
+    // Optional: Remove debug markers if you want to clean up
+    // document.querySelectorAll('#game-container .debug-marker').forEach(marker => marker.remove());
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const pageUrl = encodeURIComponent(window.location.href);
+    const shareMessage = encodeURIComponent("Hey! I won a coupon code by playing this game! You should try it too 👉 " + window.location.href);
+
+    document.getElementById('share-facebook').href =
+      `https://www.facebook.com/sharer/sharer.php?u=${pageUrl}`;
+
+    document.getElementById('share-whatsapp').href =
+      `https://api.whatsapp.com/send?text=${shareMessage}`;
+
+    document.getElementById('share-viber').href =
+      `viber://forward?text=${shareMessage}`;
+
+    document.getElementById('share-telegram').href =
+      `https://t.me/share/url?url=${pageUrl}&text=${shareMessage}`;
+  });
+</script>
+
+</body>
+</html>
